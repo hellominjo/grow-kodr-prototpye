@@ -1,0 +1,8 @@
+import React,{useState} from 'react';
+import{Button,TextField,Chip}from'@mui/material';
+import StudentPatterns from './StudentPatterns';
+export default function TierSupport({records,positive,start,end,onRecord}){
+ const[students,setStudents]=useState(()=>{try{return JSON.parse(localStorage.getItem('grow-tier2'))||['새봄']}catch{return ['새봄']}}),[selected,setSelected]=useState(students[0]||''),[name,setName]=useState(''),[error,setError]=useState('');
+ function add(e){e.preventDefault();const n=name.trim();if(!n)return;if(students.includes(n)){setSelected(n);setError('이미 등록된 학생을 선택했어요.');return;}const next=[...students,n];setStudents(next);localStorage.setItem('grow-tier2',JSON.stringify(next));setSelected(n);setName('');setError('');}
+ return <><section className="panel tier-roster"><div className="section-head"><div><div className="eyebrow">TIER 2 SUPPORT</div><h3>함께 살펴볼 학생</h3><p>교사가 지원 대상을 직접 추가합니다. 자동 선별이나 위험 순위는 만들지 않습니다.</p></div><Chip label={`${students.length}명 지원 중`} size="small"/></div><div className="filter-row">{students.map(n=><button className={selected===n?'selected':''} key={n} onClick={()=>setSelected(n)}>{n}<span>Tier 2</span></button>)}</div><form onSubmit={add} className="add-student"><TextField label="추가할 학생 가명" size="small" value={name} onChange={e=>setName(e.target.value)} required inputProps={{maxLength:20}}/><Button variant="outlined" type="submit">학생 추가</Button></form><p className="footnote">기록의 학생 가명과 같아야 연결됩니다. 기록이 없는 학생도 등록할 수 있어요.</p>{error&&<p role="status">{error}</p>}</section>{selected&&<div className="mt-5"><StudentPatterns key={selected} subject={selected} records={records} positive={positive} start={start} end={end} onRecord={()=>onRecord(selected)}/></div>}</>
+}
